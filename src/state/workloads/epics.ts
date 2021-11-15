@@ -12,9 +12,9 @@ const workloadService = new WorkloadService();
 
 const logWorkloadSubmissions: AppEpic = (action$, state$) => (
   action$.pipe(
-    filter(isActionOf(workloadsActions.submit)),
+    filter(isActionOf([workloadsActions.created, workloadsActions.cancel])),
     map(action => action.payload),
-    tap((payload) => console.log('Workload submitted', payload)),
+    tap((payload) => console.log('[epics.workload]', payload)),
     ignoreElements(),
   )
 );
@@ -29,9 +29,26 @@ const submitWorkload: AppEpic = (action$, state$) => (
   )
 );
 
+const cancelWorkload: AppEpic = (action$, state$) => (
+  action$.pipe(
+    filter(isActionOf(workloadsActions.cancel)),
+    switchMap(async action => {
+      const { id } = action.payload;
+      const { status: currentStatus } = await workloadService.checkStatus({ id });
+      if (currentStatus === 'WORKING') {
+        await workloadService.cancel({ id });
+        return workloadsActions.updateStatus({ id, status: 'CANCELED' });
+      }
+
+      return workloadsActions.updateStatus({ id, status: currentStatus });
+    }),
+  )
+);
+
 
 export const epics = combineEpics(
   submitWorkload,
+  cancelWorkload,
   logWorkloadSubmissions,
 );
 
