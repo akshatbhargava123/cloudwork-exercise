@@ -30,14 +30,15 @@ class WorkloadForm extends React.PureComponent<WorkloadFormProps, WorkloadFormSt
 
   render() {
     return (
-      <form>
-        <h2>Create workload</h2>
+      <form className="border border-purple-700 p-5">
+        <h2 className="text-2xl font-semibold">Create workload</h2>
         
-        <div>
-          <label>
+        <div className="my-3">
+          <label className="text-sm">
             Complexity: {this.state.complexity}
             <br />
             <input 
+              className="mt-2 cursor-move"
               value={this.state.complexity} 
               onChange={(e) => this.setState({ complexity: Number(e.target.value) })} 
               type="range" 
@@ -48,7 +49,7 @@ class WorkloadForm extends React.PureComponent<WorkloadFormProps, WorkloadFormSt
         </div>
 
         <div>
-          <button onClick={this.handleSubmit} type="submit">Start work</button>
+          <button className="bg-purple-700 text-white font-semibold px-5 py-2" onClick={this.handleSubmit} type="submit">Start work</button>
         </div>
       </form>
     );

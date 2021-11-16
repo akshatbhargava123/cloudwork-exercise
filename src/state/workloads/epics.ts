@@ -13,9 +13,9 @@ const workloadService = new WorkloadService();
 
 const logWorkloadSubmissions: AppEpic = (action$, state$) => (
   action$.pipe(
-    filter(isActionOf([workloadsActions.created, workloadsActions.cancel])),
-    map(action => action.payload),
-    tap((payload) => console.log('[epics.workload]', payload)),
+    filter(isActionOf(Object.values(workloadsActions))),
+    tap((action) => console.log('[epics.workload]', action.type, action.payload)),
+    tap(() => console.log('updated state :: ', state$.value.workloads)),
     ignoreElements(),
   )
 );

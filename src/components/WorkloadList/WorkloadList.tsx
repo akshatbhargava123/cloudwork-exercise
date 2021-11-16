@@ -22,12 +22,12 @@ export interface WorkloadListProps extends
 const WorkloadList: React.SFC<WorkloadListProps> = ({ workloads, cancelWorkload }) => (
   !workloads.length 
     ? (
-      <span>No workloads to display</span>
+      <p className="my-5 font-thin text-3xl">No workloads to display, create one now 👉</p>
     )
   : (
-    <ol>
+    <ol className="w-full">
       {workloads.map((workload) => (
-        <li key={workload.id}>
+        <li className="w-full" key={workload.id}>
           <WorkloadItem {...workload} onCancel={() => cancelWorkload(workload.id)} />
         </li>
       ))}
