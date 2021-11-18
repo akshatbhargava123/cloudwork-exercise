@@ -1,5 +1,5 @@
 import { combineEpics, Epic } from 'redux-observable';
-import { timer } from 'rxjs';
+import { of, timer } from 'rxjs';
 import { filter, map, tap, ignoreElements, delay, mergeMap, takeWhile, delayWhen } from 'rxjs/operators';
 import { isActionOf } from 'typesafe-actions';
 
@@ -51,12 +51,16 @@ const scheduleWorkloadUpdate: AppEpic = (action$, state$) => (
     filter(isActionOf(workloadsActions.created)),
     map(action => action.payload),
     delayWhen(payload => timer(payload.completeDate)),
-    takeWhile(value => state$.value.workloads[value.id].status === 'WORKING'),
-    delay(100),
-    map(payload => payload.id),
-    mergeMap(async (workloadId) => {
-      const workload = await workloadService.checkStatus({ id: workloadId });
-      return workloadsActions.updateStatus(workload);
+    mergeMap(value => {
+      return of(value).pipe(
+        takeWhile(value => state$.value.workloads[value.id].status === 'WORKING'),
+        delay(100),
+        map(payload => payload.id),
+        mergeMap(async (workloadId) => {
+          const workload = await workloadService.checkStatus({ id: workloadId });
+          return workloadsActions.updateStatus(workload);
+        }),
+      );
     }),
   )
 )
